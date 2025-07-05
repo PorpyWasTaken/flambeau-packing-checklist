@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flambeau River Ramble - Group Packing Checklist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+    <style>
+        .person-card {
+            transition: all 0.3s ease;
+        }
+        .person-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        .progress-ring-fill {
+            transition: stroke-dashoffset 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">🛶 Flambeau River Ramble</h1>
+            <p class="text-xl text-gray-600">Group Packing Checklist</p>
+        </div>
+
+        <!-- Name Input -->
+        <div id="nameInput" class="max-w-md mx-auto mb-8 p-6 bg-white rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-4">Enter Your Name to Get Started</h2>
+            <input 
+                type="text" 
+                id="userName" 
+                placeholder="Your name..." 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+            <button 
+                onclick="setUserName()" 
+                class="w-full mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+            >
+                Join Group
+            </button>
+        </div>
+
+        <!-- Main App (hidden initially) -->
+        <div id="mainApp" class="hidden">
+            <!-- Current User Section -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">Your Checklist</h2>
+                    <button 
+                        onclick="changeUser()" 
+                        class="text-sm text-blue-600 hover:text-blue-800"
+                    >
+                        Change Name
+                    </button>
+                </div>
+                <div id="userProgress" class="bg-white rounded-lg shadow-md p-6">
+                    <!-- User's checklist will be populated here -->
+                </div>
+            </div>
+
+            <!-- Group Overview -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Group Progress</h2>
+                <div id="groupOverview" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Group member cards will be populated here -->
+                </div>
+            </div>
+
+            <!-- Detailed View -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Detailed View</h2>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="mb-4">
+                        <select id="categoryFilter" onchange="updateDetailedView()" class="px-4 py-2 border border-gray-300 rounded-lg">
+                            <option value="all">All Categories</option>
+                            <option value="required">Required Items</option>
+                            <option value="highlyRecommended">Highly Recommended</option>
+                            <option value="optional">Optional Items</option>
+                            <option value="forBase">For Base Camp</option>
+                        </select>
+                    </div>
+                    <div id="detailedView">
+                        <!-- Detailed comparison will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration - REPLACE WITH YOUR OWN CONFIG
+
+      const firebaseConfig = {
+  apiKey: "AIzaSyAoVdv14MTRh_tST3Mwa1X6LhhIWzfahKU",
+  authDomain: "flambeau-packing-142ad.firebaseapp.com",
+  databaseURL: "https://flambeau-packing-142ad-default-rtdb.firebaseio.com",
+  projectId: "flambeau-packing-142ad",
+  storageBucket: "flambeau-packing-142ad.firebasestorage.app",
+  messagingSenderId: "219383298265",
+  appId: "1:219383298265:web:9e8f3ceb3115d50d92a6c8"
+};
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Global variables
+        let currentUser = '';
+        let allUserData = {};
+
+        // Packing items data
+        const packingItems = {
+            required: [
+                { id: 'rx_meds', text: 'Rx Medications (enough for whole week, original bottles)', note: 'Must show dosage and expiration dates' },
+                { id: 'sleeping_bag', text: 'Sleeping Bag (rated to at least 35°F)', note: 'Loaners available' },
+                { id: 'rain_jacket', text: 'Rain Jacket', note: 'Loaners available' },
+                { id: 'rain_pants', text: 'Rain Pants', note: 'Loaners available' },
+                { id: 'wet_shoes', text: 'Wet Shoes (close-toed)', note: 'Must strap securely - no flip flops or Crocs' }
+            ],
+            highlyRecommended: [
+                { id: 'toothbrush', text: 'Toothbrush' },
+                { id: 'toothpaste', text: 'Toothpaste' },
+                { id: 'hygiene_products', text: 'Personal Hygiene Items (feminine products, etc.)' },
+                { id: 'tshirt_1', text: 'T-shirt/Tank Top #1' },
+                { id: 'tshirt_2', text: 'T-shirt/Tank Top #2' },
+                { id: 'long_sleeve', text: 'Long-sleeved Shirt' },
+                { id: 'warm_sweater', text: 'Warm Sweater (wool or synthetic fleece only - NO COTTON!)' },
+                { id: 'pants_1', text: 'Quick-drying Pants #1' },
+                { id: 'pants_2', text: 'Quick-drying Pants #2' },
+                { id: 'wool_socks_1', text: 'Wool Socks - Pair #1' },
+                { id: 'wool_socks_2', text: 'Wool Socks - Pair #2' },
+                { id: 'underwear', text: 'Underwear (multiple pairs)' },
+                { id: 'sun_hat', text: 'Brimmed Hat for Sun' },
+                { id: 'warm_hat', text: 'Warm Stocking Hat' },
+                { id: 'water_bottle', text: 'Water Bottle (32 oz with screw-on top)', note: 'Loaners available' },
+                { id: 'headlamp', text: 'Headlamp/Flashlight' },
+                { id: 'dry_shoes', text: 'Dry Shoes for Campsite' }
+            ],
+            optional: [
+                { id: 'shorts_1', text: 'Shorts - Pair #1' },
+                { id: 'shorts_2', text: 'Shorts - Pair #2' },
+                { id: 'swimsuit', text: 'Swimsuit' },
+                { id: 'daypack', text: 'Small Daypack or Fanny Pack' },
+                { id: 'towel', text: 'Camping Towel (chamois, sarong)' },
+                { id: 'sleeping_pad', text: 'Sleeping Pad', note: 'Loaners available' },
+                { id: 'sunglasses', text: 'Sunglasses' },
+                { id: 'card_game', text: 'Card Game' },
+                { id: 'journal', text: 'Journal (wrapped in plastic!)' },
+                { id: 'book', text: 'Book to Read (wrapped in plastic!)' },
+                { id: 'camera', text: 'Camera (wrapped in plastic!)', note: 'Loaners available' }
+            ],
+            forBase: [
+                { id: 'clean_clothes', text: 'Clean Clothes for Car Ride Home' },
+                { id: 'toiletries', text: 'Toiletries for Shower After Trip' },
+                { id: 'money', text: 'Money for Camp Store' }
+            ]
+        };
+
+        // Set user name
+        function setUserName() {
+            const nameInput = document.getElementById('userName');
+            const name = nameInput.value.trim();
+            if (name) {
+                currentUser = name;
+                document.getElementById('nameInput').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                initializeUser();
+                setupRealtimeListeners();
+            }
+        }
+
+        // Change user
+        function changeUser() {
+            document.getElementById('nameInput').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('userName').value = '';
+            currentUser = '';
+        }
+
+        // Initialize user in database
+        function initializeUser() {
+            const userRef = database.ref(`users/${currentUser}`);
+            userRef.once('value').then((snapshot) => {
+                if (!snapshot.exists()) {
+                    // Create new user with empty checklist
+                    const emptyChecklist = {};
+                    Object.keys(packingItems).forEach(category => {
+                        packingItems[category].forEach(item => {
+                            emptyChecklist[item.id] = false;
+                        });
+                    });
+                    userRef.set({
+                        name: currentUser,
+                        checklist: emptyChecklist,
+                        lastUpdated: Date.now()
+                    });
+                }
+            });
+        }
+
+        // Setup realtime listeners
+        function setupRealtimeListeners() {
+            database.ref('users').on('value', (snapshot) => {
+                allUserData = snapshot.val() || {};
+                updateUI();
+            });
+        }
+
+        // Toggle item for current user
+        function toggleItem(itemId) {
+            const userRef = database.ref(`users/${currentUser}/checklist/${itemId}`);
+            const currentValue = allUserData[currentUser]?.checklist[itemId] || false;
+            userRef.set(!currentValue);
+            database.ref(`users/${currentUser}/lastUpdated`).set(Date.now());
+        }
+
+        // Calculate progress
+        function calculateProgress(checklist) {
+            const totalItems = Object.keys(packingItems).reduce((total, category) => {
+                return total + packingItems[category].length;
+            }, 0);
+            
+            const checkedItems = Object.values(checklist || {}).filter(Boolean).length;
+            return { checked: checkedItems, total: totalItems };
+        }
+
+        // Get category progress
+        function getCategoryProgress(checklist, category) {
+            const items = packingItems[category];
+            const checkedCount = items.filter(item => checklist[item.id]).length;
+            return { checked: checkedCount, total: items.length };
+        }
+
+        // Create progress ring SVG
+        function createProgressRing(progress, size = 60) {
+            const percentage = (progress.checked / progress.total) * 100;
+            const radius = (size - 8) / 2;
+            const circumference = 2 * Math.PI * radius;
+            const strokeDashoffset = circumference - (percentage / 100) * circumference;
+            
+            return `
+                <svg width="${size}" height="${size}" class="progress-ring">
+                    <circle cx="${size/2}" cy="${size/2}" r="${radius}" 
+                            fill="none" stroke="#e5e7eb" stroke-width="4"/>
+                    <circle cx="${size/2}" cy="${size/2}" r="${radius}" 
+                            fill="none" stroke="#10b981" stroke-width="4" 
+                            stroke-dasharray="${circumference}" 
+                            stroke-dashoffset="${strokeDashoffset}"
+                            class="progress-ring-fill"/>
+                </svg>
+            `;
+        }
+
+        // Update UI
+        function updateUI() {
+            updateUserProgress();
+            updateGroupOverview();
+            updateDetailedView();
+        }
+
+        // Update user progress
+        function updateUserProgress() {
+            const userDiv = document.getElementById('userProgress');
+            const userData = allUserData[currentUser];
+            
+            if (!userData) return;
+            
+            const progress = calculateProgress(userData.checklist);
+            
+            let html = `
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            ${createProgressRing(progress, 80)}
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <span class="text-sm font-bold text-gray-700">
+                                    ${Math.round((progress.checked / progress.total) * 100)}%
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-900">${currentUser}</h3>
+                            <p class="text-gray-600">${progress.checked}/${progress.total} items packed</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add categories
+            Object.keys(packingItems).forEach(category => {
+                const categoryProgress = getCategoryProgress(userData.checklist, category);
+                const categoryName = category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                
+                html += `
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-lg font-medium text-gray-900">${categoryName}</h4>
+                            <span class="text-sm text-gray-600">${categoryProgress.checked}/${categoryProgress.total}</span>
+                        </div>
+                        <div class="space-y-2">
+                `;
+                
+                packingItems[category].forEach(item => {
+                    const isChecked = userData.checklist[item.id] || false;
+                    html += `
+                        <div class="flex items-center space-x-3 p-2 rounded hover:bg-gray-50">
+                            <input 
+                                type="checkbox" 
+                                ${isChecked ? 'checked' : ''} 
+                                onchange="toggleItem('${item.id}')"
+                                class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            >
+                            <label class="flex-1 text-sm ${isChecked ? 'line-through text-gray-500' : 'text-gray-900'}">
+                                ${item.text}
+                                ${item.note ? `<br><span class="text-xs text-blue-600">${item.note}</span>` : ''}
+                            </label>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            userDiv.innerHTML = html;
+        }
+
+        // Update group overview
+        function updateGroupOverview() {
+            const groupDiv = document.getElementById('groupOverview');
+            let html = '';
+            
+            Object.keys(allUserData).forEach(userName => {
+                const userData = allUserData[userName];
+                const progress = calculateProgress(userData.checklist);
+                const isCurrentUser = userName === currentUser;
+                
+                html += `
+                    <div class="person-card bg-white rounded-lg shadow-md p-6 ${isCurrentUser ? 'border-2 border-blue-500' : ''}">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">
+                                ${userName} ${isCurrentUser ? '(You)' : ''}
+                            </h3>
+                            <div class="relative">
+                                ${createProgressRing(progress, 50)}
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-xs font-bold text-gray-700">
+                                        ${Math.round((progress.checked / progress.total) * 100)}%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2">
+                            ${progress.checked}/${progress.total} items packed
+                        </div>
+                        <div class="space-y-1">
+                `;
+                
+                Object.keys(packingItems).forEach(category => {
+                    const categoryProgress = getCategoryProgress(userData.checklist, category);
+                    const categoryName = category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                    
+                    html += `
+                        <div class="flex justify-between text-xs">
+                            <span class="text-gray-500">${categoryName}</span>
+                            <span class="font-medium">${categoryProgress.checked}/${categoryProgress.total}</span>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            groupDiv.innerHTML = html;
+        }
+
+        // Update detailed view
+        function updateDetailedView() {
+            const detailedDiv = document.getElementById('detailedView');
+            const selectedCategory = document.getElementById('categoryFilter').value;
+            
+            let html = '';
+            const categories = selectedCategory === 'all' ? Object.keys(packingItems) : [selectedCategory];
+            
+            categories.forEach(category => {
+                const categoryName = category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                
+                html += `
+                    <div class="mb-8">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">${categoryName}</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="border-b">
+                                        <th class="text-left py-2 px-4">Item</th>
+                `;
+                
+                Object.keys(allUserData).forEach(userName => {
+                    html += `<th class="text-center py-2 px-4 min-w-24">${userName}</th>`;
+                });
+                
+                html += `
+                                    </tr>
+                                </thead>
+                                <tbody>
+                `;
+                
+                packingItems[category].forEach(item => {
+                    html += `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="py-2 px-4">
+                                ${item.text}
+                                ${item.note ? `<br><span class="text-xs text-blue-600">${item.note}</span>` : ''}
+                            </td>
+                    `;
+                    
+                    Object.keys(allUserData).forEach(userName => {
+                        const isChecked = allUserData[userName].checklist[item.id] || false;
+                        html += `
+                            <td class="text-center py-2 px-4">
+                                <span class="inline-block w-6 h-6 rounded-full ${isChecked ? 'bg-green-500' : 'bg-gray-300'}">
+                                    ${isChecked ? '✓' : ''}
+                                </span>
+                            </td>
+                        `;
+                    });
+                    
+                    html += `</tr>`;
+                });
+                
+                html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            detailedDiv.innerHTML = html;
+        }
+
+        // Load saved user name if exists
+        window.addEventListener('load', () => {
+            const savedUser = localStorage.getItem('flambeau-user');
+            if (savedUser) {
+                document.getElementById('userName').value = savedUser;
+            }
+        });
+
+        // Save user name locally
+        function setUserName() {
+            const nameInput = document.getElementById('userName');
+            const name = nameInput.value.trim();
+            if (name) {
+                localStorage.setItem('flambeau-user', name);
+                currentUser = name;
+                document.getElementById('nameInput').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                initializeUser();
+                setupRealtimeListeners();
+            }
+        }
+    </script>
+</body>
+</html>
