@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flambeau River Ramble - Group Packing Checklist</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
     <style>
         .person-card {
             transition: all 0.3s ease;
@@ -44,6 +42,13 @@
         .category-section.forBase {
             border-left-color: #3b82f6;
         }
+        .realtime-indicator {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -57,7 +62,7 @@
 
         <!-- Connection Status -->
         <div id="connectionStatus" class="max-w-md mx-auto mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded-lg text-center text-sm text-yellow-800 hidden">
-            <span id="statusText">Connecting...</span>
+            <span id="statusText">Connecting to Firebase...</span>
         </div>
 
         <!-- Name Input -->
@@ -76,9 +81,10 @@
             >
                 Join Group
             </button>
-            <p class="text-xs text-gray-500 mt-2 text-center">
-                Your progress will be shared with the group in real-time
-            </p>
+            <div class="flex items-center justify-center mt-4 text-xs text-gray-500">
+                <div class="w-2 h-2 bg-green-500 rounded-full mr-2 realtime-indicator"></div>
+                Real-time sync with group members
+            </div>
         </div>
 
         <!-- Main App (hidden initially) -->
@@ -87,12 +93,18 @@
             <div class="mb-8">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-2xl font-bold text-gray-900">Your Checklist</h2>
-                    <button 
-                        onclick="changeUser()" 
-                        class="text-sm text-blue-600 hover:text-blue-800 underline"
-                    >
-                        Change Name
-                    </button>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center text-xs text-gray-500">
+                            <div id="syncIndicator" class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                            <span id="syncStatus">Synced</span>
+                        </div>
+                        <button 
+                            onclick="changeUser()" 
+                            class="text-sm text-blue-600 hover:text-blue-800 underline"
+                        >
+                            Change Name
+                        </button>
+                    </div>
                 </div>
                 <div id="userProgress" class="bg-white rounded-lg shadow-md p-6">
                     <!-- User's checklist will be populated here -->
@@ -101,7 +113,12 @@
 
             <!-- Group Overview -->
             <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">Group Progress</h2>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">Group Progress</h2>
+                    <div class="text-sm text-gray-500">
+                        <span id="groupMemberCount">0</span> member(s) online
+                    </div>
+                </div>
                 <div id="groupOverview" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <!-- Group member cards will be populated here -->
                 </div>
@@ -133,6 +150,10 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+
     <script>
         // Firebase configuration
         const firebaseConfig = {
@@ -153,6 +174,8 @@
         let currentUser = '';
         let allUserData = {};
         let isConnected = false;
+        let userDataRef = null;
+        let allUsersRef = null;
 
         // Packing items data
         const packingItems = {
@@ -202,22 +225,51 @@
             ]
         };
 
-        // Connection monitoring
-        const connectedRef = database.ref('.info/connected');
-        connectedRef.on('value', (snap) => {
-            isConnected = snap.val() === true;
-            updateConnectionStatus();
-        });
-
-        function updateConnectionStatus() {
-            const statusDiv = document.getElementById('connectionStatus');
+        // Initialize Firebase connection status monitoring
+        function initializeFirebase() {
+            const statusElement = document.getElementById('connectionStatus');
             const statusText = document.getElementById('statusText');
             
+            statusElement.classList.remove('hidden');
+            statusText.textContent = 'Connecting to Firebase...';
+
+            // Monitor connection status
+            const connectedRef = database.ref('.info/connected');
+            connectedRef.on('value', (snap) => {
+                isConnected = snap.val() === true;
+                updateConnectionStatus();
+            });
+
+            // Listen for all users data
+            allUsersRef = database.ref('users');
+            allUsersRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                allUserData = data || {};
+                updateUI();
+            });
+        }
+
+        // Update connection status UI
+        function updateConnectionStatus() {
+            const statusElement = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('statusText');
+            const syncIndicator = document.getElementById('syncIndicator');
+            const syncStatus = document.getElementById('syncStatus');
+
             if (isConnected) {
-                statusDiv.classList.add('hidden');
+                statusElement.classList.add('hidden');
+                if (syncIndicator) {
+                    syncIndicator.className = 'w-2 h-2 bg-green-500 rounded-full mr-2';
+                    syncStatus.textContent = 'Synced';
+                }
             } else {
-                statusDiv.classList.remove('hidden');
+                statusElement.classList.remove('hidden');
+                statusElement.className = 'max-w-md mx-auto mb-4 p-3 bg-red-100 border border-red-400 rounded-lg text-center text-sm text-red-800';
                 statusText.textContent = 'Connection lost. Reconnecting...';
+                if (syncIndicator) {
+                    syncIndicator.className = 'w-2 h-2 bg-red-500 rounded-full mr-2';
+                    syncStatus.textContent = 'Offline';
+                }
             }
         }
 
@@ -230,24 +282,32 @@
                 document.getElementById('nameInput').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
                 initializeUser();
-                setupRealtimeListeners();
             }
         }
 
         // Change user
         function changeUser() {
+            // Clean up Firebase listeners
+            if (userDataRef) {
+                userDataRef.off();
+            }
+            
             document.getElementById('nameInput').classList.remove('hidden');
             document.getElementById('mainApp').classList.add('hidden');
             document.getElementById('userName').value = '';
             currentUser = '';
-            // Clean up listeners
-            database.ref('users').off();
+            userDataRef = null;
         }
 
-        // Initialize user in database
+        // Initialize user data
         function initializeUser() {
-            const userRef = database.ref(`users/${currentUser}`);
-            userRef.once('value').then((snapshot) => {
+            if (!currentUser) return;
+
+            // Create reference to user's data
+            userDataRef = database.ref(`users/${currentUser}`);
+
+            // Check if user exists, if not create them
+            userDataRef.once('value', (snapshot) => {
                 if (!snapshot.exists()) {
                     // Create new user with empty checklist
                     const emptyChecklist = {};
@@ -256,40 +316,59 @@
                             emptyChecklist[item.id] = false;
                         });
                     });
-                    userRef.set({
+
+                    const userData = {
                         name: currentUser,
                         checklist: emptyChecklist,
-                        lastUpdated: Date.now()
+                        lastUpdated: firebase.database.ServerValue.TIMESTAMP,
+                        isOnline: true
+                    };
+
+                    userDataRef.set(userData);
+                } else {
+                    // Update online status
+                    userDataRef.update({
+                        isOnline: true,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
                     });
                 }
-            }).catch(error => {
-                console.error('Error initializing user:', error);
             });
-        }
 
-        // Setup realtime listeners
-        function setupRealtimeListeners() {
-            database.ref('users').on('value', (snapshot) => {
-                allUserData = snapshot.val() || {};
-                updateUI();
-                updateLastUpdated();
-            }, (error) => {
-                console.error('Error listening to database:', error);
-            });
+            // Set up presence system
+            userDataRef.child('isOnline').onDisconnect().set(false);
+            userDataRef.child('lastSeen').onDisconnect().set(firebase.database.ServerValue.TIMESTAMP);
         }
 
         // Toggle item for current user
         function toggleItem(itemId) {
-            if (!currentUser || !isConnected) return;
+            if (!currentUser || !userDataRef) return;
+
+            const syncIndicator = document.getElementById('syncIndicator');
+            const syncStatus = document.getElementById('syncStatus');
             
-            const userRef = database.ref(`users/${currentUser}/checklist/${itemId}`);
+            // Show syncing status
+            syncIndicator.className = 'w-2 h-2 bg-yellow-500 rounded-full mr-2 realtime-indicator';
+            syncStatus.textContent = 'Syncing...';
+
+            // Get current value and toggle it
             const currentValue = allUserData[currentUser]?.checklist?.[itemId] || false;
-            
-            userRef.set(!currentValue).then(() => {
-                database.ref(`users/${currentUser}/lastUpdated`).set(Date.now());
-            }).catch(error => {
-                console.error('Error updating item:', error);
-            });
+            const newValue = !currentValue;
+
+            // Update in Firebase
+            userDataRef.child(`checklist/${itemId}`).set(newValue)
+                .then(() => {
+                    // Update last updated timestamp
+                    userDataRef.child('lastUpdated').set(firebase.database.ServerValue.TIMESTAMP);
+                    
+                    // Reset sync indicator
+                    syncIndicator.className = 'w-2 h-2 bg-green-500 rounded-full mr-2';
+                    syncStatus.textContent = 'Synced';
+                })
+                .catch((error) => {
+                    console.error('Error updating item:', error);
+                    syncIndicator.className = 'w-2 h-2 bg-red-500 rounded-full mr-2';
+                    syncStatus.textContent = 'Error';
+                });
         }
 
         // Calculate progress
@@ -331,9 +410,22 @@
 
         // Update UI
         function updateUI() {
+            if (!currentUser) return;
+            
             updateUserProgress();
             updateGroupOverview();
             updateDetailedView();
+            updateLastUpdated();
+            updateGroupMemberCount();
+        }
+
+        // Update group member count
+        function updateGroupMemberCount() {
+            const countElement = document.getElementById('groupMemberCount');
+            if (countElement) {
+                const onlineCount = Object.values(allUserData).filter(user => user.isOnline).length;
+                countElement.textContent = onlineCount;
+            }
         }
 
         // Update user progress
@@ -341,7 +433,10 @@
             const userDiv = document.getElementById('userProgress');
             const userData = allUserData[currentUser];
             
-            if (!userData) return;
+            if (!userData) {
+                userDiv.innerHTML = '<div class="text-center text-gray-500">Loading...</div>';
+                return;
+            }
             
             const progress = calculateProgress(userData.checklist);
             
@@ -423,13 +518,17 @@
                 const userData = allUserData[userName];
                 const progress = calculateProgress(userData.checklist);
                 const isCurrentUser = userName === currentUser;
+                const isOnline = userData.isOnline;
                 
                 html += `
                     <div class="person-card bg-white rounded-lg shadow-md p-6 ${isCurrentUser ? 'border-2 border-blue-500' : ''}">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-semibold text-gray-900">
-                                ${userName} ${isCurrentUser ? '(You)' : ''}
-                            </h3>
+                            <div class="flex items-center space-x-2">
+                                <h3 class="text-lg font-semibold text-gray-900">
+                                    ${userName} ${isCurrentUser ? '(You)' : ''}
+                                </h3>
+                                <div class="w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-400'}"></div>
+                            </div>
                             <div class="relative">
                                 ${createProgressRing(progress, 50)}
                                 <div class="absolute inset-0 flex items-center justify-center">
@@ -470,7 +569,7 @@
             });
             
             if (userNames.length === 0) {
-                html = '<div class="col-span-full text-center text-gray-500">No group members yet. Share this link with your group!</div>';
+                html = '<div class="col-span-full text-center text-gray-500">No group members yet.</div>';
             }
             
             groupDiv.innerHTML = html;
@@ -503,7 +602,15 @@
                     
                     userNames.forEach(userName => {
                         const isCurrentUser = userName === currentUser;
-                        html += `<th class="text-center py-3 px-4 min-w-24 font-medium ${isCurrentUser ? 'text-blue-600' : ''}">${userName}${isCurrentUser ? ' (You)' : ''}</th>`;
+                        const isOnline = allUserData[userName]?.isOnline;
+                        html += `
+                            <th class="text-center py-3 px-4 min-w-24 font-medium ${isCurrentUser ? 'text-blue-600' : ''}">
+                                <div class="flex items-center justify-center space-x-1">
+                                    <span>${userName}${isCurrentUser ? ' (You)' : ''}</span>
+                                    <div class="w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-400'}"></div>
+                                </div>
+                            </th>
+                        `;
                     });
                     
                     html += `
@@ -552,52 +659,4 @@
         function formatCategoryName(category) {
             const names = {
                 'required': 'Required Items',
-                'highlyRecommended': 'Highly Recommended',
-                'optional': 'Optional Items',
-                'forBase': 'For Base Camp'
-            };
-            return names[category] || category;
-        }
-
-        // Update last updated timestamp
-        function updateLastUpdated() {
-            const lastUpdatedSpan = document.getElementById('lastUpdated');
-            if (lastUpdatedSpan) {
-                lastUpdatedSpan.textContent = new Date().toLocaleString();
-            }
-        }
-
-        // Initialize app
-        window.addEventListener('load', () => {
-            // Try to load saved user name
-            const savedUser = localStorage.getItem('flambeau-user');
-            if (savedUser) {
-                document.getElementById('userName').value = savedUser;
-            }
-        });
-
-        // Enhanced setUserName function to save locally
-        function setUserName() {
-            const nameInput = document.getElementById('userName');
-            const name = nameInput.value.trim();
-            if (name) {
-                localStorage.setItem('flambeau-user', name);
-                currentUser = name;
-                document.getElementById('nameInput').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                initializeUser();
-                setupRealtimeListeners();
-            }
-        }
-
-        // Handle offline/online status
-        window.addEventListener('online', () => {
-            updateConnectionStatus();
-        });
-        
-        window.addEventListener('offline', () => {
-            updateConnectionStatus();
-        });
-    </script>
-</body>
-</html>
+                'highlyRecommended':
