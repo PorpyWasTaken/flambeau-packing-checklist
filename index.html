@@ -1,662 +1,786 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flambeau River Ramble - Group Packing Checklist</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Flambeau River Ramble - Packing Checklist</title>
     <style>
-        .person-card {
-            transition: all 0.3s ease;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .person-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+
+```
+    body {
+        font-family: 'Arial', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+
+    .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header p {
+        font-size: 1.2em;
+        opacity: 0.9;
+    }
+
+    .user-setup {
+        padding: 30px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .user-input {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .user-input input {
+        padding: 12px 20px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        min-width: 200px;
+        transition: border-color 0.3s;
+    }
+
+    .user-input input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+    .user-input button {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .user-input button:hover {
+        transform: translateY(-2px);
+    }
+
+    .current-user {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 18px;
+        color: #2c3e50;
+    }
+
+    .main-content {
+        display: flex;
+        min-height: 600px;
+    }
+
+    .checklist-section {
+        flex: 1;
+        padding: 30px;
+    }
+
+    .friends-section {
+        flex: 0 0 350px;
+        background: #f8f9fa;
+        padding: 30px;
+        border-left: 1px solid #e9ecef;
+    }
+
+    .section-title {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+        color: #2c3e50;
+        border-bottom: 3px solid #667eea;
+        padding-bottom: 10px;
+    }
+
+    .category {
+        margin-bottom: 30px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        border-left: 4px solid #667eea;
+    }
+
+    .category h3 {
+        font-size: 1.3em;
+        margin-bottom: 15px;
+        color: #2c3e50;
+    }
+
+    .item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        padding: 10px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+
+    .item:hover {
+        transform: translateX(5px);
+    }
+
+    .item input[type="checkbox"] {
+        margin-right: 12px;
+        transform: scale(1.2);
+        cursor: pointer;
+    }
+
+    .item label {
+        cursor: pointer;
+        font-size: 16px;
+        flex: 1;
+    }
+
+    .item.checked label {
+        text-decoration: line-through;
+        color: #666;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 20px;
+        background: #e9ecef;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transition: width 0.3s ease;
+    }
+
+    .progress-text {
+        text-align: center;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .friend-card {
+        background: white;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+
+    .friend-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .friend-card {
+        cursor: pointer;
+    }
+
+    .friend-card.active {
+        border: 2px solid #667eea;
+        background: #f0f4ff;
+    }
+
+    .friend-name {
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 8px;
+        color: #2c3e50;
+    }
+
+    .friend-progress {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .friend-progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 5px;
+    }
+
+    .friend-progress-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transition: width 0.3s ease;
+    }
+
+    .firebase-note {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        color: #856404;
+    }
+
+    .firebase-note strong {
+        color: #b8860b;
+    }
+
+    .view-toggle {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        align-items: center;
+    }
+
+    .view-toggle button {
+        padding: 8px 16px;
+        border: 1px solid #ddd;
+        background: white;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+
+    .view-toggle button.active {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+
+    .view-toggle button:hover {
+        background: #f8f9fa;
+    }
+
+    .view-toggle button.active:hover {
+        background: #5a6fd8;
+    }
+
+    .viewing-user {
+        font-size: 14px;
+        color: #666;
+        font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+        .main-content {
+            flex-direction: column;
         }
-        .progress-ring {
-            transform: rotate(-90deg);
+        
+        .friends-section {
+            flex: none;
+            border-left: none;
+            border-top: 1px solid #e9ecef;
         }
-        .progress-ring-fill {
-            transition: stroke-dashoffset 0.3s ease;
+        
+        .header h1 {
+            font-size: 2em;
         }
-        .item-row {
-            transition: all 0.2s ease;
-        }
-        .item-row:hover {
-            background-color: #f8fafc;
-        }
-        .category-section {
-            border-left: 4px solid #e5e7eb;
-            padding-left: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .category-section.required {
-            border-left-color: #ef4444;
-        }
-        .category-section.highlyRecommended {
-            border-left-color: #f59e0b;
-        }
-        .category-section.optional {
-            border-left-color: #10b981;
-        }
-        .category-section.forBase {
-            border-left-color: #3b82f6;
-        }
-        .realtime-indicator {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-    </style>
+    }
+</style>
+```
+
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">🛶 Flambeau River Ramble</h1>
-            <p class="text-xl text-gray-600">Group Packing Checklist</p>
-            <p class="text-sm text-gray-500 mt-2">Pack smart, paddle together!</p>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛶 Flambeau River Ramble</h1>
+            <p>Group Packing Checklist - Get Ready for Adventure!</p>
         </div>
 
-        <!-- Connection Status -->
-        <div id="connectionStatus" class="max-w-md mx-auto mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded-lg text-center text-sm text-yellow-800 hidden">
-            <span id="statusText">Connecting to Firebase...</span>
+```
+    <div class="user-setup">
+        <div class="user-input">
+            <input type="text" id="userName" placeholder="Enter your name" maxlength="20">
+            <button onclick="setUser()">Join Group</button>
         </div>
-
-        <!-- Name Input -->
-        <div id="nameInput" class="max-w-md mx-auto mb-8 p-6 bg-white rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold mb-4">Enter Your Name to Get Started</h2>
-            <input 
-                type="text" 
-                id="userName" 
-                placeholder="Your name..." 
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onkeypress="if(event.key==='Enter') setUserName()"
-            >
-            <button 
-                onclick="setUserName()" 
-                class="w-full mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
-            >
-                Join Group
-            </button>
-            <div class="flex items-center justify-center mt-4 text-xs text-gray-500">
-                <div class="w-2 h-2 bg-green-500 rounded-full mr-2 realtime-indicator"></div>
-                Real-time sync with group members
-            </div>
-        </div>
-
-        <!-- Main App (hidden initially) -->
-        <div id="mainApp" class="hidden">
-            <!-- Current User Section -->
-            <div class="mb-8">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-2xl font-bold text-gray-900">Your Checklist</h2>
-                    <div class="flex items-center space-x-4">
-                        <div class="flex items-center text-xs text-gray-500">
-                            <div id="syncIndicator" class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                            <span id="syncStatus">Synced</span>
-                        </div>
-                        <button 
-                            onclick="changeUser()" 
-                            class="text-sm text-blue-600 hover:text-blue-800 underline"
-                        >
-                            Change Name
-                        </button>
-                    </div>
-                </div>
-                <div id="userProgress" class="bg-white rounded-lg shadow-md p-6">
-                    <!-- User's checklist will be populated here -->
-                </div>
-            </div>
-
-            <!-- Group Overview -->
-            <div class="mb-8">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-2xl font-bold text-gray-900">Group Progress</h2>
-                    <div class="text-sm text-gray-500">
-                        <span id="groupMemberCount">0</span> member(s) online
-                    </div>
-                </div>
-                <div id="groupOverview" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Group member cards will be populated here -->
-                </div>
-            </div>
-
-            <!-- Detailed View -->
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">Detailed View</h2>
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="mb-4">
-                        <select id="categoryFilter" onchange="updateDetailedView()" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="all">All Categories</option>
-                            <option value="required">Required Items</option>
-                            <option value="highlyRecommended">Highly Recommended</option>
-                            <option value="optional">Optional Items</option>
-                            <option value="forBase">For Base Camp</option>
-                        </select>
-                    </div>
-                    <div id="detailedView">
-                        <!-- Detailed comparison will be populated here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="text-center text-sm text-gray-500 mt-8">
-                <p>Last updated: <span id="lastUpdated">Never</span></p>
-            </div>
+        <div class="current-user" id="currentUser" style="display: none;">
+            Welcome, <span id="userNameDisplay"></span>!
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+    <div class="firebase-note">
+        <strong>Firebase Integration Ready:</strong> To connect with Firebase, replace the placeholder config in the JavaScript section with your actual Firebase configuration. This will enable real-time syncing across all users.
+    </div>
 
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAoVdv14MTRh_tST3Mwa1X6LhhIWzfahKU",
-            authDomain: "flambeau-packing-142ad.firebaseapp.com",
-            databaseURL: "https://flambeau-packing-142ad-default-rtdb.firebaseio.com",
-            projectId: "flambeau-packing-142ad",
-            storageBucket: "flambeau-packing-142ad.firebasestorage.app",
-            messagingSenderId: "219383298265",
-            appId: "1:219383298265:web:9e8f3ceb3115d50d92a6c8"
-        };
+    <div class="main-content">
+        <div class="checklist-section">
+            <div class="view-toggle">
+                <button id="myViewBtn" class="active" onclick="switchToMyView()">My Packing List</button>
+                <button id="friendViewBtn" onclick="switchToFriendView()">Friend's List</button>
+                <span class="viewing-user" id="viewingUser"></span>
+            </div>
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        // Global variables
-        let currentUser = '';
-        let allUserData = {};
-        let isConnected = false;
-        let userDataRef = null;
-        let allUsersRef = null;
-
-        // Packing items data
-        const packingItems = {
-            required: [
-                { id: 'rx_meds', text: 'Rx Medications (enough for whole week, original bottles)', note: 'Must show dosage and expiration dates' },
-                { id: 'sleeping_bag', text: 'Sleeping Bag (rated to at least 35°F)', note: 'Loaners available' },
-                { id: 'rain_jacket', text: 'Rain Jacket', note: 'Loaners available' },
-                { id: 'rain_pants', text: 'Rain Pants', note: 'Loaners available' },
-                { id: 'wet_shoes', text: 'Wet Shoes (close-toed)', note: 'Must strap securely - no flip flops or Crocs' }
-            ],
-            highlyRecommended: [
-                { id: 'toothbrush', text: 'Toothbrush' },
-                { id: 'toothpaste', text: 'Toothpaste' },
-                { id: 'hygiene_products', text: 'Personal Hygiene Items (feminine products, etc.)' },
-                { id: 'tshirt_1', text: 'T-shirt/Tank Top #1' },
-                { id: 'tshirt_2', text: 'T-shirt/Tank Top #2' },
-                { id: 'long_sleeve', text: 'Long-sleeved Shirt' },
-                { id: 'warm_sweater', text: 'Warm Sweater (wool or synthetic fleece only - NO COTTON!)' },
-                { id: 'pants_1', text: 'Quick-drying Pants #1' },
-                { id: 'pants_2', text: 'Quick-drying Pants #2' },
-                { id: 'wool_socks_1', text: 'Wool Socks - Pair #1' },
-                { id: 'wool_socks_2', text: 'Wool Socks - Pair #2' },
-                { id: 'underwear', text: 'Underwear (multiple pairs)' },
-                { id: 'sun_hat', text: 'Brimmed Hat for Sun' },
-                { id: 'warm_hat', text: 'Warm Stocking Hat' },
-                { id: 'water_bottle', text: 'Water Bottle (32 oz with screw-on top)', note: 'Loaners available' },
-                { id: 'headlamp', text: 'Headlamp/Flashlight' },
-                { id: 'dry_shoes', text: 'Dry Shoes for Campsite' }
-            ],
-            optional: [
-                { id: 'shorts_1', text: 'Shorts - Pair #1' },
-                { id: 'shorts_2', text: 'Shorts - Pair #2' },
-                { id: 'swimsuit', text: 'Swimsuit' },
-                { id: 'daypack', text: 'Small Daypack or Fanny Pack' },
-                { id: 'towel', text: 'Camping Towel (chamois, sarong)' },
-                { id: 'sleeping_pad', text: 'Sleeping Pad', note: 'Loaners available' },
-                { id: 'sunglasses', text: 'Sunglasses' },
-                { id: 'card_game', text: 'Card Game' },
-                { id: 'journal', text: 'Journal (wrapped in plastic!)' },
-                { id: 'book', text: 'Book to Read (wrapped in plastic!)' },
-                { id: 'camera', text: 'Camera (wrapped in plastic!)', note: 'Loaners available' }
-            ],
-            forBase: [
-                { id: 'clean_clothes', text: 'Clean Clothes for Car Ride Home' },
-                { id: 'toiletries', text: 'Toiletries for Shower After Trip' },
-                { id: 'money', text: 'Money for Camp Store' }
-            ]
-        };
-
-        // Initialize Firebase connection status monitoring
-        function initializeFirebase() {
-            const statusElement = document.getElementById('connectionStatus');
-            const statusText = document.getElementById('statusText');
+            <h2 class="section-title" id="sectionTitle">Your Packing Progress</h2>
             
-            statusElement.classList.remove('hidden');
-            statusText.textContent = 'Connecting to Firebase...';
+            <div class="progress-text">Overall Progress: <span id="progressText">0%</span></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
 
-            // Monitor connection status
-            const connectedRef = database.ref('.info/connected');
-            connectedRef.on('value', (snap) => {
-                isConnected = snap.val() === true;
-                updateConnectionStatus();
-            });
+            <div class="category">
+                <h3>🚨 Required Items</h3>
+                <div class="item">
+                    <input type="checkbox" id="rx-meds" onchange="updateProgress()">
+                    <label for="rx-meds">Rx Medications (enough for whole week, in original bottles)</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="sleeping-bag" onchange="updateProgress()">
+                    <label for="sleeping-bag">Sleeping Bag (rated to at least 35°F)</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="rain-gear" onchange="updateProgress()">
+                    <label for="rain-gear">Rain gear (jacket and pants)</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="wet-shoes" onchange="updateProgress()">
+                    <label for="wet-shoes">Wet shoes (must be close-toed)</label>
+                </div>
+            </div>
 
-            // Listen for all users data
-            allUsersRef = database.ref('users');
-            allUsersRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                allUserData = data || {};
-                updateUI();
-            });
-        }
+            <div class="category">
+                <h3>⭐ Highly Recommended Items</h3>
+                <div class="item">
+                    <input type="checkbox" id="hygiene" onchange="updateProgress()">
+                    <label for="hygiene">Personal hygiene items (toothbrush, toothpaste, etc.)</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="t-shirts" onchange="updateProgress()">
+                    <label for="t-shirts">2 t-shirts/tank tops</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="long-sleeve" onchange="updateProgress()">
+                    <label for="long-sleeve">1 long-sleeved shirt</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="warm-sweater" onchange="updateProgress()">
+                    <label for="warm-sweater">1 warm sweater (Wool or Synthetic Fleece only)</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="pants" onchange="updateProgress()">
+                    <label for="pants">2 pair pants (Quick drying pants are best)</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="wool-socks" onchange="updateProgress()">
+                    <label for="wool-socks">2 pairs wool socks</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="underwear" onchange="updateProgress()">
+                    <label for="underwear">Underwear</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="sun-hat" onchange="updateProgress()">
+                    <label for="sun-hat">Brimmed hat for sun</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="warm-hat" onchange="updateProgress()">
+                    <label for="warm-hat">Warm stocking hat for chilly nights</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="water-bottle" onchange="updateProgress()">
+                    <label for="water-bottle">Water bottle (32 oz. with screw-on top)</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="headlamp" onchange="updateProgress()">
+                    <label for="headlamp">Headlamp/Flashlight</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="dry-shoes" onchange="updateProgress()">
+                    <label for="dry-shoes">Dry shoes for campsite</label>
+                </div>
+            </div>
 
-        // Update connection status UI
-        function updateConnectionStatus() {
-            const statusElement = document.getElementById('connectionStatus');
-            const statusText = document.getElementById('statusText');
-            const syncIndicator = document.getElementById('syncIndicator');
-            const syncStatus = document.getElementById('syncStatus');
+            <div class="category">
+                <h3>📦 Optional Items</h3>
+                <div class="item">
+                    <input type="checkbox" id="shorts" onchange="updateProgress()">
+                    <label for="shorts">1 or 2 pairs of shorts</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="swimsuit" onchange="updateProgress()">
+                    <label for="swimsuit">Swimsuit</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="daypack" onchange="updateProgress()">
+                    <label for="daypack">Small daypack or fanny pack</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="towel" onchange="updateProgress()">
+                    <label for="towel">Camping towel (chamois, sarong)</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="sleeping-pad" onchange="updateProgress()">
+                    <label for="sleeping-pad">Sleeping pad</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="sunglasses" onchange="updateProgress()">
+                    <label for="sunglasses">Sunglasses</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="entertainment" onchange="updateProgress()">
+                    <label for="entertainment">Card game, journal, or book (wrapped in plastic!)</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="camera" onchange="updateProgress()">
+                    <label for="camera">Camera (wrapped in plastic!)</label>
+                </div>
+            </div>
 
-            if (isConnected) {
-                statusElement.classList.add('hidden');
-                if (syncIndicator) {
-                    syncIndicator.className = 'w-2 h-2 bg-green-500 rounded-full mr-2';
-                    syncStatus.textContent = 'Synced';
-                }
-            } else {
-                statusElement.classList.remove('hidden');
-                statusElement.className = 'max-w-md mx-auto mb-4 p-3 bg-red-100 border border-red-400 rounded-lg text-center text-sm text-red-800';
-                statusText.textContent = 'Connection lost. Reconnecting...';
-                if (syncIndicator) {
-                    syncIndicator.className = 'w-2 h-2 bg-red-500 rounded-full mr-2';
-                    syncStatus.textContent = 'Offline';
-                }
-            }
-        }
+            <div class="category">
+                <h3>🏠 For Base Use</h3>
+                <div class="item">
+                    <input type="checkbox" id="clean-clothes" onchange="updateProgress()">
+                    <label for="clean-clothes">Clean clothes for car ride home</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="toiletries" onchange="updateProgress()">
+                    <label for="toiletries">Toiletries to shower at camp after trip</label>
+                </div>
+                <div class="item">
+                    <input type="checkbox" id="money" onchange="updateProgress()">
+                    <label for="money">Money for camp store (t-shirts, water bottles, stickers)</label>
+                </div>
+            </div>
+        </div>
 
-        // Set user name
-        function setUserName() {
-            const nameInput = document.getElementById('userName');
-            const name = nameInput.value.trim();
-            if (name) {
-                currentUser = name;
-                document.getElementById('nameInput').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                initializeUser();
-            }
-        }
-
-        // Change user
-        function changeUser() {
-            // Clean up Firebase listeners
-            if (userDataRef) {
-                userDataRef.off();
-            }
-            
-            document.getElementById('nameInput').classList.remove('hidden');
-            document.getElementById('mainApp').classList.add('hidden');
-            document.getElementById('userName').value = '';
-            currentUser = '';
-            userDataRef = null;
-        }
-
-        // Initialize user data
-        function initializeUser() {
-            if (!currentUser) return;
-
-            // Create reference to user's data
-            userDataRef = database.ref(`users/${currentUser}`);
-
-            // Check if user exists, if not create them
-            userDataRef.once('value', (snapshot) => {
-                if (!snapshot.exists()) {
-                    // Create new user with empty checklist
-                    const emptyChecklist = {};
-                    Object.keys(packingItems).forEach(category => {
-                        packingItems[category].forEach(item => {
-                            emptyChecklist[item.id] = false;
-                        });
-                    });
-
-                    const userData = {
-                        name: currentUser,
-                        checklist: emptyChecklist,
-                        lastUpdated: firebase.database.ServerValue.TIMESTAMP,
-                        isOnline: true
-                    };
-
-                    userDataRef.set(userData);
-                } else {
-                    // Update online status
-                    userDataRef.update({
-                        isOnline: true,
-                        lastSeen: firebase.database.ServerValue.TIMESTAMP
-                    });
-                }
-            });
-
-            // Set up presence system
-            userDataRef.child('isOnline').onDisconnect().set(false);
-            userDataRef.child('lastSeen').onDisconnect().set(firebase.database.ServerValue.TIMESTAMP);
-        }
-
-        // Toggle item for current user
-        function toggleItem(itemId) {
-            if (!currentUser || !userDataRef) return;
-
-            const syncIndicator = document.getElementById('syncIndicator');
-            const syncStatus = document.getElementById('syncStatus');
-            
-            // Show syncing status
-            syncIndicator.className = 'w-2 h-2 bg-yellow-500 rounded-full mr-2 realtime-indicator';
-            syncStatus.textContent = 'Syncing...';
-
-            // Get current value and toggle it
-            const currentValue = allUserData[currentUser]?.checklist?.[itemId] || false;
-            const newValue = !currentValue;
-
-            // Update in Firebase
-            userDataRef.child(`checklist/${itemId}`).set(newValue)
-                .then(() => {
-                    // Update last updated timestamp
-                    userDataRef.child('lastUpdated').set(firebase.database.ServerValue.TIMESTAMP);
-                    
-                    // Reset sync indicator
-                    syncIndicator.className = 'w-2 h-2 bg-green-500 rounded-full mr-2';
-                    syncStatus.textContent = 'Synced';
-                })
-                .catch((error) => {
-                    console.error('Error updating item:', error);
-                    syncIndicator.className = 'w-2 h-2 bg-red-500 rounded-full mr-2';
-                    syncStatus.textContent = 'Error';
-                });
-        }
-
-        // Calculate progress
-        function calculateProgress(checklist) {
-            const totalItems = Object.keys(packingItems).reduce((total, category) => {
-                return total + packingItems[category].length;
-            }, 0);
-            
-            const checkedItems = Object.values(checklist || {}).filter(Boolean).length;
-            return { checked: checkedItems, total: totalItems };
-        }
-
-        // Get category progress
-        function getCategoryProgress(checklist, category) {
-            const items = packingItems[category];
-            const checkedCount = items.filter(item => checklist?.[item.id]).length;
-            return { checked: checkedCount, total: items.length };
-        }
-
-        // Create progress ring SVG
-        function createProgressRing(progress, size = 60) {
-            const percentage = progress.total > 0 ? (progress.checked / progress.total) * 100 : 0;
-            const radius = (size - 8) / 2;
-            const circumference = 2 * Math.PI * radius;
-            const strokeDashoffset = circumference - (percentage / 100) * circumference;
-            
-            return `
-                <svg width="${size}" height="${size}" class="progress-ring">
-                    <circle cx="${size/2}" cy="${size/2}" r="${radius}" 
-                            fill="none" stroke="#e5e7eb" stroke-width="4"/>
-                    <circle cx="${size/2}" cy="${size/2}" r="${radius}" 
-                            fill="none" stroke="#10b981" stroke-width="4" 
-                            stroke-dasharray="${circumference}" 
-                            stroke-dashoffset="${strokeDashoffset}"
-                            class="progress-ring-fill"/>
-                </svg>
-            `;
-        }
-
-        // Update UI
-        function updateUI() {
-            if (!currentUser) return;
-            
-            updateUserProgress();
-            updateGroupOverview();
-            updateDetailedView();
-            updateLastUpdated();
-            updateGroupMemberCount();
-        }
-
-        // Update group member count
-        function updateGroupMemberCount() {
-            const countElement = document.getElementById('groupMemberCount');
-            if (countElement) {
-                const onlineCount = Object.values(allUserData).filter(user => user.isOnline).length;
-                countElement.textContent = onlineCount;
-            }
-        }
-
-        // Update user progress
-        function updateUserProgress() {
-            const userDiv = document.getElementById('userProgress');
-            const userData = allUserData[currentUser];
-            
-            if (!userData) {
-                userDiv.innerHTML = '<div class="text-center text-gray-500">Loading...</div>';
-                return;
-            }
-            
-            const progress = calculateProgress(userData.checklist);
-            
-            let html = `
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center space-x-4">
-                        <div class="relative">
-                            ${createProgressRing(progress, 80)}
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-sm font-bold text-gray-700">
-                                    ${progress.total > 0 ? Math.round((progress.checked / progress.total) * 100) : 0}%
-                                </span>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-900">${currentUser}</h3>
-                            <p class="text-gray-600">${progress.checked}/${progress.total} items packed</p>
-                        </div>
+        <div class="friends-section">
+            <h2 class="section-title">Group Progress</h2>
+            <div id="friendsList">
+                <div class="friend-card">
+                    <div class="friend-name">🏕️ Example User</div>
+                    <div class="friend-progress">15/23 items packed (65%)</div>
+                    <div class="friend-progress-bar">
+                        <div class="friend-progress-fill" style="width: 65%"></div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Firebase configuration (replace with your actual config)
+    const firebaseConfig = {
+  apiKey: "AIzaSyAoVdv14MTRh_tST3Mwa1X6LhhIWzfahKU",
+  authDomain: "flambeau-packing-142ad.firebaseapp.com",
+  databaseURL: "https://flambeau-packing-142ad-default-rtdb.firebaseio.com",
+  projectId: "flambeau-packing-142ad",
+  storageBucket: "flambeau-packing-142ad.firebasestorage.app",
+  messagingSenderId: "219383298265",
+  appId: "1:219383298265:web:9e8f3ceb3115d50d92a6c8"
+};
+        // Your Firebase config goes here
+        // apiKey: "your-api-key",
+        // authDomain: "your-auth-domain",
+        // databaseURL: "your-database-url",
+        // projectId: "your-project-id",
+        // storageBucket: "your-storage-bucket",
+        // messagingSenderId: "your-messaging-sender-id",
+        // appId: "your-app-id"
+
+    // Initialize Firebase (uncomment when you have your config)
+    // import { initializeApp } from 'firebase/app';
+    // import { getDatabase, ref, set, on } from 'firebase/database';
+    // const app = initializeApp(firebaseConfig);
+    // const database = getDatabase(app);
+
+    let currentUser = '';
+    let users = {}; // This will store all user data
+    let viewingUser = ''; // Track which user's list we're viewing
+    let isViewingFriend = false;
+
+    function setUser() {
+        const userName = document.getElementById('userName').value.trim();
+        if (userName) {
+            currentUser = userName;
+            document.getElementById('userNameDisplay').textContent = userName;
+            document.getElementById('currentUser').style.display = 'block';
+            document.getElementById('userName').style.display = 'none';
+            document.querySelector('.user-input button').style.display = 'none';
+            
+            // Load user's existing data or create new
+            loadUserData();
+        }
+    }
+
+    function loadUserData() {
+        // In a real Firebase implementation, this would load from the database
+        // For now, we'll use localStorage as a demo
+        const savedData = localStorage.getItem(`flambeau_${currentUser}`);
+        if (savedData) {
+            const userData = JSON.parse(savedData);
+            // Apply saved checkboxes
+            Object.keys(userData).forEach(id => {
+                const checkbox = document.getElementById(id);
+                if (checkbox) {
+                    checkbox.checked = userData[id];
+                }
+            });
+            updateProgress();
+        }
+    }
+
+    function updateProgress() {
+        if (!currentUser) return;
+
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        const totalItems = checkboxes.length;
+        let checkedItems = 0;
+        const userData = {};
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                checkedItems++;
+                checkbox.parentElement.classList.add('checked');
+            } else {
+                checkbox.parentElement.classList.remove('checked');
+            }
+            userData[checkbox.id] = checkbox.checked;
+        });
+
+        const percentage = Math.round((checkedItems / totalItems) * 100);
+        
+        document.getElementById('progressText').textContent = `${percentage}%`;
+        document.getElementById('progressFill').style.width = `${percentage}%`;
+
+        // Save to localStorage (in real app, this would save to Firebase)
+        localStorage.setItem(`flambeau_${currentUser}`, JSON.stringify(userData));
+        
+        // Update users object
+        users[currentUser] = {
+            name: currentUser,
+            checkedItems: checkedItems,
+            totalItems: totalItems,
+            percentage: percentage,
+            items: {...userData}
+        };
+
+        updateFriendsList();
+    }
+
+    function updateFriendsList() {
+        const friendsList = document.getElementById('friendsList');
+        friendsList.innerHTML = '';
+
+        // In a real Firebase implementation, this would listen to database changes
+        // For now, we'll show the current user and any demo data
+        Object.values(users).forEach(user => {
+            const friendCard = document.createElement('div');
+            friendCard.className = 'friend-card';
+            
+            const isCurrentUser = user.name === currentUser;
+            const userIcon = isCurrentUser ? '🌟' : '🏕️';
+            
+            // Add click handler to view friend's list
+            friendCard.addEventListener('click', () => {
+                viewFriendList(user.name);
+            });
+            
+            friendCard.innerHTML = `
+                <div class="friend-name">${userIcon} ${user.name} ${isCurrentUser ? '(You)' : ''}</div>
+                <div class="friend-progress">${user.checkedItems}/${user.totalItems} items packed (${user.percentage}%)</div>
+                <div class="friend-progress-bar">
+                    <div class="friend-progress-fill" style="width: ${user.percentage}%"></div>
                 </div>
             `;
             
-            // Add categories
-            Object.keys(packingItems).forEach(category => {
-                const categoryProgress = getCategoryProgress(userData.checklist, category);
-                const categoryName = formatCategoryName(category);
-                
-                html += `
-                    <div class="category-section ${category} mb-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="text-lg font-medium text-gray-900">${categoryName}</h4>
-                            <div class="flex items-center space-x-2">
-                                <span class="text-sm text-gray-600">${categoryProgress.checked}/${categoryProgress.total}</span>
-                                <div class="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                    <div class="h-full bg-green-500 transition-all duration-300" 
-                                         style="width: ${categoryProgress.total > 0 ? (categoryProgress.checked / categoryProgress.total) * 100 : 0}%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="space-y-2">
-                `;
-                
-                packingItems[category].forEach(item => {
-                    const isChecked = userData.checklist?.[item.id] || false;
-                    html += `
-                        <div class="item-row flex items-start space-x-3 p-3 rounded-lg border ${isChecked ? 'border-green-200 bg-green-50' : 'border-gray-200 hover:border-gray-300'}">
-                            <input 
-                                type="checkbox" 
-                                ${isChecked ? 'checked' : ''} 
-                                onchange="toggleItem('${item.id}')"
-                                class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mt-1 flex-shrink-0"
-                            >
-                            <label class="flex-1 text-sm cursor-pointer ${isChecked ? 'line-through text-gray-500' : 'text-gray-900'}"
-                                   onclick="toggleItem('${item.id}')">
-                                ${item.text}
-                                ${item.note ? `<br><span class="text-xs text-blue-600 font-medium">${item.note}</span>` : ''}
-                            </label>
-                        </div>
-                    `;
-                });
-                
-                html += `
-                        </div>
-                    </div>
-                `;
-            });
-            
-            userDiv.innerHTML = html;
-        }
+            friendsList.appendChild(friendCard);
+        });
+    }
 
-        // Update group overview
-        function updateGroupOverview() {
-            const groupDiv = document.getElementById('groupOverview');
-            let html = '';
-            
-            const userNames = Object.keys(allUserData).sort();
-            
-            userNames.forEach(userName => {
-                const userData = allUserData[userName];
-                const progress = calculateProgress(userData.checklist);
-                const isCurrentUser = userName === currentUser;
-                const isOnline = userData.isOnline;
-                
-                html += `
-                    <div class="person-card bg-white rounded-lg shadow-md p-6 ${isCurrentUser ? 'border-2 border-blue-500' : ''}">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center space-x-2">
-                                <h3 class="text-lg font-semibold text-gray-900">
-                                    ${userName} ${isCurrentUser ? '(You)' : ''}
-                                </h3>
-                                <div class="w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-400'}"></div>
-                            </div>
-                            <div class="relative">
-                                ${createProgressRing(progress, 50)}
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <span class="text-xs font-bold text-gray-700">
-                                        ${progress.total > 0 ? Math.round((progress.checked / progress.total) * 100) : 0}%
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-sm text-gray-600 mb-3">
-                            ${progress.checked}/${progress.total} items packed
-                        </div>
-                        <div class="space-y-2">
-                `;
-                
-                Object.keys(packingItems).forEach(category => {
-                    const categoryProgress = getCategoryProgress(userData.checklist, category);
-                    const categoryName = formatCategoryName(category);
-                    
-                    html += `
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="text-gray-500">${categoryName}</span>
-                            <div class="flex items-center space-x-2">
-                                <span class="font-medium">${categoryProgress.checked}/${categoryProgress.total}</span>
-                                <div class="w-12 h-1 bg-gray-200 rounded-full overflow-hidden">
-                                    <div class="h-full bg-green-500 transition-all duration-300" 
-                                         style="width: ${categoryProgress.total > 0 ? (categoryProgress.checked / categoryProgress.total) * 100 : 0}%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                html += `
-                        </div>
-                    </div>
-                `;
-            });
-            
-            if (userNames.length === 0) {
-                html = '<div class="col-span-full text-center text-gray-500">No group members yet.</div>';
+    function viewFriendList(friendName) {
+        viewingUser = friendName;
+        isViewingFriend = true;
+        
+        // Update UI to show we're viewing a friend's list
+        document.getElementById('myViewBtn').classList.remove('active');
+        document.getElementById('friendViewBtn').classList.add('active');
+        document.getElementById('sectionTitle').textContent = `${friendName}'s Packing List`;
+        document.getElementById('viewingUser').textContent = `Viewing: ${friendName}`;
+        
+        // Highlight the selected friend card
+        document.querySelectorAll('.friend-card').forEach(card => {
+            card.classList.remove('active');
+            if (card.textContent.includes(friendName)) {
+                card.classList.add('active');
             }
-            
-            groupDiv.innerHTML = html;
-        }
+        });
+        
+        // Load friend's data and display
+        loadFriendData(friendName);
+        
+        // Disable all checkboxes since we're viewing someone else's list
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.disabled = true;
+        });
+    }
 
-        // Update detailed view
-        function updateDetailedView() {
-            const detailedDiv = document.getElementById('detailedView');
-            const selectedCategory = document.getElementById('categoryFilter').value;
+    function loadFriendData(friendName) {
+        const friendData = users[friendName];
+        if (!friendData || !friendData.items) return;
+        
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            const isChecked = friendData.items[checkbox.id] || false;
+            checkbox.checked = isChecked;
             
-            let html = '';
-            const categories = selectedCategory === 'all' ? Object.keys(packingItems) : [selectedCategory];
-            const userNames = Object.keys(allUserData).sort();
-            
-            if (userNames.length === 0) {
-                html = '<div class="text-center text-gray-500">No group members to compare yet.</div>';
+            if (isChecked) {
+                checkbox.parentElement.classList.add('checked');
             } else {
-                categories.forEach(category => {
-                    const categoryName = formatCategoryName(category);
-                    
-                    html += `
-                        <div class="mb-8">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-4">${categoryName}</h4>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm">
-                                    <thead>
-                                        <tr class="border-b-2 border-gray-200">
-                                            <th class="text-left py-3 px-4 font-medium">Item</th>
-                    `;
-                    
-                    userNames.forEach(userName => {
-                        const isCurrentUser = userName === currentUser;
-                        const isOnline = allUserData[userName]?.isOnline;
-                        html += `
-                            <th class="text-center py-3 px-4 min-w-24 font-medium ${isCurrentUser ? 'text-blue-600' : ''}">
-                                <div class="flex items-center justify-center space-x-1">
-                                    <span>${userName}${isCurrentUser ? ' (You)' : ''}</span>
-                                    <div class="w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-400'}"></div>
-                                </div>
-                            </th>
-                        `;
-                    });
-                    
-                    html += `
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                    `;
-                    
-                    packingItems[category].forEach(item => {
-                        html += `
-                            <tr class="border-b border-gray-100 hover:bg-gray-50">
-                                <td class="py-3 px-4">
-                                    <div class="font-medium">${item.text}</div>
-                                    ${item.note ? `<div class="text-xs text-blue-600 mt-1">${item.note}</div>` : ''}
-                                </td>
-                        `;
-                        
-                        userNames.forEach(userName => {
-                            const isChecked = allUserData[userName]?.checklist?.[item.id] || false;
-                            const isCurrentUser = userName === currentUser;
-                            html += `
-                                <td class="text-center py-3 px-4">
-                                    <div class="inline-flex items-center justify-center w-8 h-8 rounded-full ${isChecked ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'} ${isCurrentUser ? 'ring-2 ring-blue-200' : ''}">
-                                        ${isChecked ? '✓' : '○'}
-                                    </div>
-                                </td>
-                            `;
-                        });
-                        
-                        html += `</tr>`;
-                    });
-                    
-                    html += `
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    `;
-                });
+                checkbox.parentElement.classList.remove('checked');
             }
-            
-            detailedDiv.innerHTML = html;
-        }
+        });
+        
+        // Update progress display
+        document.getElementById('progressText').textContent = `${friendData.percentage}%`;
+        document.getElementById('progressFill').style.width = `${friendData.percentage}%`;
+    }
 
-        // Format category name
-        function formatCategoryName(category) {
-            const names = {
-                'required': 'Required Items',
-                'highlyRecommended':
+    function switchToMyView() {
+        if (!currentUser) return;
+        
+        isViewingFriend = false;
+        viewingUser = '';
+        
+        // Update UI
+        document.getElementById('myViewBtn').classList.add('active');
+        document.getElementById('friendViewBtn').classList.remove('active');
+        document.getElementById('sectionTitle').textContent = 'Your Packing Progress';
+        document.getElementById('viewingUser').textContent = '';
+        
+        // Remove active state from friend cards
+        document.querySelectorAll('.friend-card').forEach(card => {
+            card.classList.remove('active');
+        });
+        
+        // Re-enable checkboxes
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.disabled = false;
+        });
+        
+        // Load current user's data
+        loadUserData();
+    }
+
+    function switchToFriendView() {
+        // This button is just for UI, actual friend selection happens by clicking friend cards
+        if (viewingUser) {
+            viewFriendList(viewingUser);
+        }
+    }
+
+    // Handle enter key in name input
+    document.getElementById('userName').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            setUser();
+        }
+    });
+
+    // Initialize with demo data
+    users['Example User'] = {
+        name: 'Example User',
+        checkedItems: 15,
+        totalItems: 23,
+        percentage: 65,
+        items: {
+            'rx-meds': true,
+            'sleeping-bag': true,
+            'rain-gear': true,
+            'wet-shoes': true,
+            'hygiene': true,
+            't-shirts': true,
+            'long-sleeve': true,
+            'warm-sweater': false,
+            'pants': true,
+            'wool-socks': true,
+            'underwear': true,
+            'sun-hat': true,
+            'warm-hat': false,
+            'water-bottle': true,
+            'headlamp': true,
+            'dry-shoes': true,
+            'shorts': true,
+            'swimsuit': true,
+            'daypack': false,
+            'towel': false,
+            'sleeping-pad': false,
+            'sunglasses': true,
+            'entertainment': false,
+            'camera': false,
+            'clean-clothes': false,
+            'toiletries': false,
+            'money': false
+        }
+    };
+
+    users['Adventure Buddy'] = {
+        name: 'Adventure Buddy',
+        checkedItems: 8,
+        totalItems: 23,
+        percentage: 35,
+        items: {
+            'rx-meds': true,
+            'sleeping-bag': true,
+            'rain-gear': false,
+            'wet-shoes': true,
+            'hygiene': true,
+            't-shirts': true,
+            'long-sleeve': false,
+            'warm-sweater': false,
+            'pants': true,
+            'wool-socks': false,
+            'underwear': true,
+            'sun-hat': false,
+            'warm-hat': false,
+            'water-bottle': true,
+            'headlamp': false,
+            'dry-shoes': false,
+            'shorts': false,
+            'swimsuit': false,
+            'daypack': false,
+            'towel': false,
+            'sleeping-pad': false,
+            'sunglasses': false,
+            'entertainment': false,
+            'camera': false,
+            'clean-clothes': false,
+            'toiletries': false,
+            'money': false
+        }
+    };
+    
+    updateFriendsList();
+</script>
+```
+
+</body>
+</html>
