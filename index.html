@@ -326,9 +326,7 @@
         </div>
     </div>
 
-    <div class="firebase-note">
-        <strong>Firebase Integration Ready:</strong> To connect with Firebase, replace the placeholder config in the JavaScript section with your actual Firebase configuration. This will enable real-time syncing across all users.
-    </div>
+
 
     <div class="main-content">
         <div class="checklist-section">
@@ -705,79 +703,7 @@
         }
     });
 
-    // Initialize with demo data
-    users['Example User'] = {
-        name: 'Example User',
-        checkedItems: 15,
-        totalItems: 23,
-        percentage: 65,
-        items: {
-            'rx-meds': true,
-            'sleeping-bag': true,
-            'rain-gear': true,
-            'wet-shoes': true,
-            'hygiene': true,
-            't-shirts': true,
-            'long-sleeve': true,
-            'warm-sweater': false,
-            'pants': true,
-            'wool-socks': true,
-            'underwear': true,
-            'sun-hat': true,
-            'warm-hat': false,
-            'water-bottle': true,
-            'headlamp': true,
-            'dry-shoes': true,
-            'shorts': true,
-            'swimsuit': true,
-            'daypack': false,
-            'towel': false,
-            'sleeping-pad': false,
-            'sunglasses': true,
-            'entertainment': false,
-            'camera': false,
-            'clean-clothes': false,
-            'toiletries': false,
-            'money': false
-        }
-    };
-
-    users['Adventure Buddy'] = {
-        name: 'Adventure Buddy',
-        checkedItems: 8,
-        totalItems: 23,
-        percentage: 35,
-        items: {
-            'rx-meds': true,
-            'sleeping-bag': true,
-            'rain-gear': false,
-            'wet-shoes': true,
-            'hygiene': true,
-            't-shirts': true,
-            'long-sleeve': false,
-            'warm-sweater': false,
-            'pants': true,
-            'wool-socks': false,
-            'underwear': true,
-            'sun-hat': false,
-            'warm-hat': false,
-            'water-bottle': true,
-            'headlamp': false,
-            'dry-shoes': false,
-            'shorts': false,
-            'swimsuit': false,
-            'daypack': false,
-            'towel': false,
-            'sleeping-pad': false,
-            'sunglasses': false,
-            'entertainment': false,
-            'camera': false,
-            'clean-clothes': false,
-            'toiletries': false,
-            'money': false
-        }
-    };
-    
+    // Initialize empty users object
     updateFriendsList();
 </script>
 ```
